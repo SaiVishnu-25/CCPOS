@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="CCPOS — Campus Cafeteria Pre-Ordering System. Skip the lunch queue, pre-order and pay ahead."/>
+  <meta name="theme-color" content="#e63946"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍱</text></svg>"/>
+  <title>CCPOS | Campus Cafeteria Pre-Ordering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <!-- Floating stickers layer (background decoration) -->
+  <div class="stickers" id="stickers"></div>
+
+  <!-- Top navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand" id="brandBtn">
+      <div class="brand-mark">🍱</div>
+      <div class="brand-text">
+        <div class="brand-main">CCPOS</div>
+        <div class="brand-sub">Campus Cafeteria Pre-Ordering</div>
+      </div>
+    </div>
+
+    <div class="nav-search">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="navSearch" placeholder="Search menu items…" autocomplete="off"/>
+      </div>
+    </div>
+
+    <div class="nav-actions" id="navActions">
+      <button class="nav-icon-btn" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+      <button class="nav-icon-btn cart-btn" id="cartBtn" title="View cart" aria-label="View cart">
+        🛒 <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <button class="nav-btn" id="userBtn">Sign In</button>
+    </div>
+  </nav>
+
+  <!-- Cart drawer -->
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-inner">
+      <div class="cart-drawer-header">
+        <h3>Your Order</h3>
+        <button class="close-cart" id="closeCart" aria-label="Close cart">&times;</button>
+      </div>
+      <div class="cart-drawer-body" id="cartBody"></div>
+      <div class="cart-drawer-footer" id="cartFooter"></div>
+    </div>
+  </div>
+
+  <!-- Overlay for drawer / modals -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Main content (router swaps views here) -->
+  <main class="app-main" id="appMain"></main>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Item detail modal -->
+  <div class="modal" id="itemModal" style="display:none">
+    <div class="modal-backdrop" data-close-item></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalItemName">Item</h3>
+        <button class="close-modal" data-close-item>&times;</button>
+      </div>
+      <div class="modal-body" id="modalItemBody"></div>
+      <div class="modal-footer" id="modalItemFooter"></div>
+    </div>
+  </div>
+
+  <!-- Generic modal (staff management, etc.) -->
+  <div class="modal" id="genericModal" style="display:none">
+    <div class="modal-backdrop" data-close-generic></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="genericModalTitle">Modal</h3>
+        <button class="close-modal" data-close-generic>&times;</button>
+      </div>
+      <div class="modal-body" id="genericModalBody"></div>
+      <div class="modal-footer" id="genericModalFooter"></div>
+    </div>
+  </div>
+
+  <!-- Supabase JS (UMD build exposes window.supabase) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="store.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

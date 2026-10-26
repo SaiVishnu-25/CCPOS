@@ -1,0 +1,6 @@
+# Files kept in the repo but not needed in the deployed static site.
+# IMPORTANT: do NOT ignore scripts/ or package.json — the Vercel build
+# command (node scripts/build-config.js) needs them to generate config.js.
+supabase/
+*.md
+.gitignore

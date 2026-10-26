@@ -1,0 +1,10 @@
+{
+  "name": "ccpos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CCPOS — Campus Cafeteria Pre-Ordering System (static frontend + Supabase)",
+  "scripts": {
+    "build": "node scripts/build-config.js"
+  },
+  "license": "MIT"
+}
