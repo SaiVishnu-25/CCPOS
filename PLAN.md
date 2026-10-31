@@ -68,12 +68,10 @@ GitHub  →  Vercel (static hosting)  →  Supabase (Auth + Postgres + RLS + Edg
 - **Smart fallback:** if `config.js` has no Supabase keys, the app runs in **offline demo mode** using `localStorage` with seeded data — perfect for a quick demo.
 - **Admin provisioning:** the `admin-users` Edge Function verifies the caller's JWT, confirms they are an active admin, then uses the service role to create/delete staff accounts.
 
-### Deployment target
-| Service | Plan | Cost |
-|---------|------|------|
-| GitHub | Public repo | ₹0 |
-| Vercel | Hobby (static) | ₹0 |
-| Supabase | Free tier | ₹0 |
+### Deployment Architecture
+- **Web Hosting:** Vercel (Static Hosting)
+- **Database & Auth:** Supabase (PostgreSQL, Auth, RLS)
+- **Source Control:** GitHub
 
 ---
 
@@ -120,7 +118,7 @@ CCPOS/
 ├── supabase/functions/admin-users # Edge Function for staff provisioning
 ├── vercel.json                    # Static hosting config
 ├── PLAN.md                        # This document
-└── README.md                      # Setup + free deployment guide
+└── README.md                      # Project documentation
 ```
 
 ---
@@ -146,4 +144,4 @@ CCPOS/
 - ✅ Admin can create/manage staff
 - ✅ Staff manages the menu and fulfils orders
 - ✅ Data persists (Supabase in production, localStorage in demo)
-- ✅ Free-tier deployable via GitHub → Vercel + Supabase
+- ✅ Deployable via GitHub → Vercel + Supabase

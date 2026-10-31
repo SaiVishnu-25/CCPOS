@@ -1,161 +1,90 @@
 # 🍱 CCPOS — Campus Cafeteria Pre-Ordering System
 
-A modern, fully responsive web app where **students, faculty and guests** pre-order canteen food, and **staff & admins** manage the menu, orders and staff. Built as a college project with a **100% free** stack: **Vercel + Supabase + GitHub**.
+A modern, responsive web application designed for campus cafeterias. **Students, faculty, and guests** can browse menus, place pre-orders, and track meal preparation in real-time, while **staff and administrators** manage kitchen fulfillment, menu items, and user accounts.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-### For Students / Faculty / Guests
-- 🔐 Sign up & sign in (roles: student, faculty, guest)
-- 🍽️ Browse the daily menu with search, category & dietary filters
-- ❤️ Favorites, ⭐ ratings, item detail modal
-- 🛒 Cart + checkout with pickup time slots & payment method
-- 📍 Live order tracking (Placed → Preparing → Ready → Picked Up) + printable receipt
-- 📜 Order history & one-tap re-order
-- 👩‍🏫 **Faculty perk:** 10% discount + priority badge
+### For Customers (Students / Faculty / Guests)
+- 🔐 **Authentication & Profiles:** Role-based access with custom privileges (Student, Faculty, Guest).
+- 🍽️ **Interactive Menu:** Browse categories, search items, and filter by dietary preferences (Veg, Non-Veg, Vegan, Gluten-Free).
+- ❤️ **Favorites & Ratings:** Save frequently ordered items and rate dishes.
+- 🛒 **Cart & Checkout:** Real-time cart calculations, pickup time slot selection, and flexible payment simulation.
+- 📍 **Order Tracking:** Live status timeline (Placed → Preparing → Ready → Picked Up) and printable order receipts.
+- 📜 **Order History:** View past orders with one-click re-ordering.
+- 👩‍🏫 **Faculty Discount:** Automatic 10% discount badge for verified faculty.
 
 ### For Staff
-- 📋 Live order board — start preparing, mark ready, mark picked up
-- 🍽️ Menu manager — add / edit / delete dishes, toggle sold-out
-- 🔄 Auto-refreshing dashboard
+- 📋 **Live Kitchen Board:** Manage order fulfillment pipeline (Start Preparing, Mark Ready, Mark Picked Up).
+- 🍽️ **Menu Management:** Add, edit, remove items, or toggle daily availability/sold-out status.
+- 🔄 **Real-Time Updates:** Dynamic order updates without page reloads.
 
-### For Admin
-- 📊 Overview with revenue, orders & active staff KPIs
-- 👥 **Staff management** — create staff/admin accounts, promote/demote, enable/disable, delete
-- 🍽️ Full menu manager + 📋 order board
-- 📈 Analytics — top sellers, revenue, wastage insight
+### For Administrators
+- 📊 **Executive Dashboard:** Live metrics for revenue, total orders, active staff, and average prep time.
+- 👥 **Staff Provisioning:** Create, manage, activate, deactivate, or remove staff and administrative accounts.
+- 📈 **Analytics & Insights:** Sales performance, top-selling items, and inventory trends.
 
-### UI / UX
-- 🎨 Food-themed design, glassmorphism cards, dark/light mode
-- 🍕 **Floating animated stickers** drifting across every page
-- ✨ Staggered card entrances, hover lifts, cart-badge bounce, toast notifications
-- 📱 Fully responsive (mobile, tablet, desktop)
+### Modern UI / UX
+- 🎨 Food-themed modern aesthetic with glassmorphism styling and dark/light mode toggle.
+- 🍕 Playful animated sticker physics and smooth micro-interactions.
+- 📱 Fully responsive layout tailored for mobile devices, tablets, and desktops.
 
 ---
 
-## 🔐 Roles & Access
+## 🔐 Roles & Permissions
 
-| Role | How they get an account | What they can do |
-|------|------------------------|------------------|
-| **Student** | Self sign-up | Order, track, favorites, history |
-| **Faculty** | Self sign-up | Same as student + 10% off |
-| **Guest** | Self sign-up | Order, track (parents/visitors) |
-| **Staff** | Created by Admin | Manage menu + fulfil orders |
-| **Admin** | Created by Admin / promoted | Everything + manage staff |
+| Role | Access Level | Permissions |
+|------|--------------|-------------|
+| **Student** | Self Sign-up | Order meals, schedule pickup, live tracking, favorites, history |
+| **Faculty** | Self Sign-up | All Student permissions + automatic **10% discount** |
+| **Guest** | Self Sign-up | Ordering & tracking for visitors and campus guests |
+| **Staff** | Admin-Provisioned | Menu management + kitchen order fulfillment board |
+| **Admin** | Admin-Provisioned | Full system control: staff provisioning, menu, orders, analytics |
 
-Staff and Admin use the **separate “Staff / Admin” tab** on the login page. They cannot self-register — only an admin can provision them.
+*Note: Staff and Admin access requires provisioning by an administrator and authentication via the dedicated Staff/Admin portal.*
 
 ---
 
-## 🧪 Try it instantly (Demo Mode — no setup)
+## 🚀 Quickstart
 
-The app ships with **zero-config demo mode** (uses `localStorage`). Just open `index.html` in any browser.
+### 1. Instant Demo Mode (Zero Setup)
+The application works immediately out of the box with zero configuration required. All data persists locally via `localStorage`.
 
-**Demo accounts** (also available as one-click chips on the login page):
+1. Open `index.html` in any modern web browser.
+2. Log in using any of the preset demo accounts (also accessible via one-click chips on the sign-in screen):
 
 | Role | Email | Password |
 |------|-------|----------|
-| Student | `student@campus.edu` | `student` |
-| Faculty | `faculty@campus.edu` | `faculty` |
-| Guest | `guest@campus.edu` | `guest` |
-| Staff | `staff@campus.edu` | `staff` |
-| Admin | `admin@campus.edu` | `admin` |
-
-> In demo mode the admin can create new staff accounts directly from **Admin Console → Staff → Add Staff**.
+| **Student** | `student@campus.edu` | `student` |
+| **Faculty** | `faculty@campus.edu` | `faculty` |
+| **Guest** | `guest@campus.edu` | `guest` |
+| **Staff** | `staff@campus.edu` | `staff` |
+| **Admin** | `admin@campus.edu` | `admin` |
 
 ---
 
-## 🚀 Go Live — Free Stack
+### 2. Backend Integration (Optional)
+To connect a cloud database and authentication service:
 
-### Step 1 — Supabase (database + auth)
+1. **Database Schema:** Execute [`supabase-schema.sql`](supabase-schema.sql) in your database editor to initialize the required tables, Row Level Security (RLS) policies, and starter menu items.
+2. **Configuration:** Copy the template configuration file:
+   ```bash
+   cp config.example.js config.js
+   ```
+   Add your project credentials to `config.js`:
+   ```javascript
+   window.CCPOS_CONFIG = {
+     supabaseUrl: "https://YOUR-PROJECT.supabase.co",
+     supabaseAnonKey: "YOUR-ANON-PUBLIC-KEY"
+   };
+   ```
+   *(Note: `config.js` is included in `.gitignore` to keep credentials secure.)*
 
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor → New query**, paste the entire contents of [`supabase-schema.sql`](supabase-schema.sql), and click **Run**.
-3. Go to **Authentication → Providers → Email** and **turn OFF “Confirm email”** for a smooth college demo (optional but recommended).
-4. Go to **Project Settings → API** and copy:
-   - **Project URL**
-   - **anon public** key
-5. For **local testing**, copy the example config and paste your keys in:
-
-```powershell
-copy config.example.js config.js
-```
-
-```js
-window.CCPOS_CONFIG = {
-  supabaseUrl: "https://YOUR-PROJECT.supabase.co",
-  supabaseAnonKey: "YOUR-ANON-PUBLIC-KEY"
-};
-```
-
-> `config.js` is **gitignored** — your keys are never pushed to GitHub.
-> For the deployed site, set `SUPABASE_URL` / `SUPABASE_ANON_KEY` in Vercel instead (Step 3).
-
-6. **Create your first admin:**
-   - Open the app and **Sign up** normally (you'll become a `student`).
-   - In Supabase **SQL Editor**, run:
-
-```sql
-update public.profiles
-set role = 'admin'
-where email = 'YOUR-EMAIL@example.com';
-```
-
-   - Sign out and sign back in → you'll land in the **Admin Console**.
-
-7. **Enable admin → create staff (optional, recommended):**
-   Deploy the included Edge Function so the “Add Staff” button can create real accounts:
-
-```bash
-npm install -g supabase
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
-supabase functions deploy admin-users
-```
-
-   `SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are injected automatically by Supabase — no extra secrets needed. Free tier includes Edge Functions.
-
-> If you skip step 7, admin can still **promote / disable / delete** existing accounts, and you can create staff manually in **Supabase Dashboard → Authentication → Users** then set their `role` in the `profiles` table.
-
-### Step 2 — GitHub
-
-The repo is already initialised. To push changes later:
-
-```bash
-git add .
-git commit -m "your message"
-git push
-```
-
-### Step 3 — Vercel
-
-1. Go to [vercel.com](https://vercel.com) → **Add New → Project** → import your GitHub repo.
-2. Framework preset: **Other**.
-3. Root directory: `./`
-4. **Environment Variables** (Project Settings → Environment Variables) — add:
-
-   | Name | Value |
-   |------|-------|
-   | `SUPABASE_URL` | `https://YOUR-PROJECT.supabase.co` |
-   | `SUPABASE_ANON_KEY` | your **anon public** key |
-
-   These are only stored in Vercel — never in GitHub.
-
-5. Build command: `node scripts/build-config.js` · Output directory: `dist`
-   (already configured in `vercel.json`).
-6. Click **Deploy**. Done — you get a free `*.vercel.app` URL.
-
-> The build script generates `config.js` from those env vars into `dist/`.
-> If you skip the env vars, the deployed site still runs in **demo mode**.
-
-> Every `git push` auto-deploys. Free tier, no credit card.
-
-### Step 4 — Lock down Supabase (recommended)
-
-In **Authentication → URL Configuration**, set:
-- **Site URL:** `https://your-app.vercel.app`
-- **Redirect URLs:** `https://your-app.vercel.app`
+3. **Cloud Deployment (Vercel):**
+   - Import the repository into Vercel.
+   - Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in **Project Settings → Environment Variables**.
+   - The build script (`scripts/build-config.js`) will automatically generate the configuration file at deploy time.
 
 ---
 
@@ -163,69 +92,37 @@ In **Authentication → URL Configuration**, set:
 
 ```
 CCPOS/
-├── index.html                     # App shell (navbar, cart, modals)
-├── style.css                      # Theme, animations, floating stickers, responsive
-├── app.js                         # Routing, views, role logic, actions
-├── store.js                       # Data + auth layer (Supabase ⇄ local fallback)
-├── config.example.js              # Template config (safe to commit)
-├── config.js                      # Your real keys — GITIGNORED, never committed
-├── scripts/build-config.js        # Vercel build: env vars → dist/config.js
-├── supabase-schema.sql            # Tables, RLS policies, trigger, menu seed
-├── supabase/functions/admin-users # Edge Function: admin creates/deletes staff
-├── vercel.json                    # Vercel build + static config
-├── .gitignore                     # Keeps config.js and .env* out of Git
-├── PLAN.md                        # Project plan & architecture
-└── README.md                      # This file
+├── index.html                     # App shell (navigation, views, cart, modals)
+├── style.css                      # Design system, animations, themes, responsiveness
+├── app.js                         # Application router, UI view controllers, state logic
+├── store.js                       # Data access layer (backend adapter with local fallback)
+├── config.example.js              # Template configuration
+├── supabase-schema.sql            # Database tables, RLS policies, seed data
+├── supabase/functions/admin-users # Edge function for staff user management
+├── scripts/build-config.js        # Deployment build script for environment variables
+├── vercel.json                    # Hosting and routing configuration
+├── PLAN.md                        # Architecture & system design specification
+└── README.md                      # Project documentation
 ```
 
-### 🔒 Keeping keys private
+---
 
-| Where | What to do |
-|-------|------------|
-| **GitHub** | Only `config.example.js` is committed. `config.js`, `.env*` are ignored (verified with `git check-ignore`). |
-| **Vercel** | Add `SUPABASE_URL` + `SUPABASE_ANON_KEY` as Environment Variables; the build generates `config.js` inside `dist/`. |
-| **Supabase** | The **anon public** key is the only key the browser needs. The **service_role** key lives only in the Edge Function runtime. |
+## 🧠 Architecture & Design
 
-> ⚠️ Never paste your `service_role` key into `config.js`, GitHub, or any frontend file.
+- **Dual-Mode Adapter (`store.js`):** Unified asynchronous data interface. When cloud credentials are provided, the app connects to the live backend; otherwise, it seamlessly falls back to offline local storage.
+- **Row-Level Security (RLS):** Granular access policies enforce that customer data remains private, public users can only view active menus, and kitchen/administrative actions are restricted to authenticated staff.
+- **Role Isolation:** Enforces customer vs. operational boundaries at both application routing and database policy levels.
 
 ---
 
-## 🧠 How it works
+## 🛠️ Customization
 
-- **Smart adapter (`store.js`)** — the UI talks to one async API. If `config.js` has Supabase keys it uses **Supabase Auth + Postgres**; otherwise it runs in **offline demo mode** with seeded data. This means the site never breaks during a demo.
-- **Security** — Row Level Security (RLS) enforces that:
-  - everyone can read the menu,
-  - only staff/admin can write the menu or update orders,
-  - users only see their own orders, favorites and profile,
-  - only admins can manage staff.
-- **Role detection** — the app reads your `profiles.role` and routes you to the correct dashboard.
-- **Provisioning** — the `admin-users` Edge Function verifies the caller is an admin (via JWT) before using the service role to create/delete accounts.
-
----
-
-## 💸 Cost breakdown (all free)
-
-| Service | Free tier |
-|---------|-----------|
-| **GitHub** | Unlimited public repos |
-| **Vercel** | Hobby plan — static hosting, auto-deploy |
-| **Supabase** | Free tier — Postgres, Auth, RLS, Edge Functions |
-| **Fonts** | Google Fonts (free) |
-| **Icons** | Emoji (no cost) |
-
-**Total: ₹0**
-
----
-
-## 🛠️ Customisation tips
-
-- **Change colors:** edit CSS variables at the top of `style.css` (`--brand`, `--green`, etc.).
-- **Add menu items:** use the Staff/Admin **Menu Manager**, or edit the seed in `supabase-schema.sql`.
-- **Change pickup slots:** edit the `SLOTS` array in `app.js`.
-- **Faculty discount:** change `0.10` in `discountRate()` in `app.js`.
+- **Branding & Theme:** Customize the CSS variables in [`style.css`](style.css) (`--brand`, `--green`, `--surface`, etc.).
+- **Pickup Slots:** Modify the available time intervals in the `SLOTS` definition inside [`app.js`](app.js).
+- **Discounts:** Adjust the discount rate in `discountRate()` inside [`app.js`](app.js).
 
 ---
 
 ## 📄 License
 
-MIT — free to use for your college project. Attribution appreciated but not required.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
