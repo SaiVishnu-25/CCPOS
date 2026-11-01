@@ -88,6 +88,35 @@ To connect a cloud database and authentication service:
 
 ---
 
+## 🩺 Troubleshooting
+
+### The deployed site loads, but the menu is empty and sign-in / sign-up fails
+
+This means Vercel is connected to Supabase, but the **database schema was never applied** (the `public.menu_items` and `public.profiles` tables do not exist yet). The app now shows a setup banner in this case.
+
+1. Open your project's **SQL Editor**: `https://supabase.com/dashboard/project/<PROJECT-REF>/sql/new`
+2. Paste the **entire** [`supabase-schema.sql`](supabase-schema.sql) file and click **Run**.
+   - It is idempotent — safe to run again later.
+   - It creates the tables, RLS policies, API grants, the signup trigger and the starter menu.
+   - It also backfills profiles for accounts that signed up before the schema existed.
+3. Reload the deployed site. The menu and accounts should now work — no redeploy needed.
+4. Promote your own account to admin (after signing up normally):
+   ```sql
+   update public.profiles set role = 'admin' where email = 'you@example.com';
+   ```
+
+### Staff/Admin console cannot create accounts
+
+The Admin Console uses the `admin-users` Edge Function. Deploy it once:
+
+```bash
+supabase functions deploy admin-users
+```
+
+(or paste [`supabase/functions/admin-users/index.ts`](supabase/functions/admin-users/index.ts) into **Dashboard → Edge Functions → Deploy a new function**).
+
+---
+
 ## 🗂️ Project Structure
 
 ```

@@ -57,6 +57,23 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ---------------------------------------------------------------------------
+-- 2b. BACKFILL PROFILES FOR ACCOUNTS CREATED BEFORE THE SCHEMA EXISTED
+-- Safe to re-run: existing profiles are left untouched.
+-- ---------------------------------------------------------------------------
+insert into public.profiles (id, full_name, email, role)
+select
+  u.id,
+  coalesce(u.raw_user_meta_data->>'full_name', split_part(u.email, '@', 1)),
+  u.email,
+  case
+    when coalesce(u.raw_user_meta_data->>'role', 'student') in ('student','faculty','guest')
+      then coalesce(u.raw_user_meta_data->>'role', 'student')
+    else 'student'
+  end
+from auth.users u
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
 -- 3. ROLE HELPER FUNCTIONS (SECURITY DEFINER avoids RLS recursion)
 -- ---------------------------------------------------------------------------
 create or replace function public.is_staff()
@@ -207,6 +224,25 @@ create policy order_items_update on public.order_items
 drop policy if exists favorites_all on public.favorites;
 create policy favorites_all on public.favorites
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- 7b. API GRANTS (PostgREST roles)
+-- RLS above still decides which rows are visible/writable.
+-- ---------------------------------------------------------------------------
+grant usage on schema public to anon, authenticated;
+
+grant select on public.menu_items to anon, authenticated;
+grant insert, update, delete on public.menu_items to authenticated;
+
+grant select, update on public.profiles to authenticated;
+grant insert on public.profiles to authenticated;
+
+grant select, insert, update on public.orders to authenticated;
+grant select, insert, update on public.order_items to authenticated;
+grant select, insert, delete on public.favorites to authenticated;
+
+grant execute on function public.is_staff() to anon, authenticated;
+grant execute on function public.is_admin() to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 8. SEED MENU (safe: only inserts when the table is empty)

@@ -418,6 +418,27 @@ h1, h2, h3 { font-family: 'Poppins', 'Inter', sans-serif; line-height: 1.2; }
 .toast.warn { background: var(--amber); color: #3a2a18; }
 .toast.error { background: var(--brand); }
 
+/* ---------- Backend setup banner ---------- */
+.setup-banner {
+  position: fixed; top: 72px; left: 0; right: 0; z-index: 95;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  background: #fff4e0; color: #5a3a10;
+  border-bottom: 1px solid #f0d3a4;
+  font-size: 0.86rem; font-weight: 600; line-height: 1.45;
+  box-shadow: 0 6px 18px -14px rgba(0,0,0,0.4);
+}
+body.dark .setup-banner { background: #3a2c14; color: #ffe6bd; border-bottom-color: #5a4520; }
+.setup-banner-icon { font-size: 1.1rem; }
+.setup-banner-text { flex: 1; }
+.setup-banner-close {
+  flex: none; font-size: 1.3rem; line-height: 1; padding: 0 6px;
+  color: inherit; opacity: 0.7;
+}
+.setup-banner-close:hover { opacity: 1; }
+body.setup-banner-open .hero { padding-top: 152px; }
+body.setup-banner-open .auth-page { padding-top: 120px; }
+
 /* ---------- Overlay ---------- */
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 250;

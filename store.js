@@ -280,13 +280,33 @@
     }))
   });
 
+  /* Turn low-level PostgREST errors into actionable messages. */
+  const friendlyDbError = (err) => {
+    const code = err?.code || "";
+    const msg = String(err?.message || err || "");
+    if (code === "PGRST205" || code === "42P01" || /could not find the table|relation .* does not exist/i.test(msg)) {
+      return new Error(
+        "Supabase is connected, but its database is not initialised (tables are missing). " +
+        "Open the Supabase SQL Editor and run supabase-schema.sql, then reload this page."
+      );
+    }
+    if (code === "42501" || /permission denied/i.test(msg)) {
+      return new Error(
+        "Supabase permissions are missing. Re-run supabase-schema.sql to apply the API grants, then reload this page."
+      );
+    }
+    return err instanceof Error ? err : new Error(msg || "Database request failed.");
+  };
+
   const SupabaseAdapter = {
     mode: "supabase",
     user: null,
+    schemaReady: true,
+    schemaError: null,
 
     async _profile(id) {
       const { data, error } = await supa.from("profiles").select("*").eq("id", id).maybeSingle();
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return data ? mapProfile(data) : null;
     },
 
@@ -294,6 +314,18 @@
       supa = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {
         auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
       });
+
+      // Probe once so the UI can explain a missing/uninitialised schema instead
+      // of silently showing an empty menu.
+      const probe = await supa.from("menu_items").select("id").limit(1);
+      if (probe.error) {
+        this.schemaReady = false;
+        this.schemaError = friendlyDbError(probe.error);
+      } else {
+        this.schemaReady = true;
+        this.schemaError = null;
+      }
+
       const { data } = await supa.auth.getSession();
       if (data.session?.user) {
         this.user = await this._profile(data.session.user.id);
@@ -308,7 +340,7 @@
 
     async login(email, password) {
       const { data, error } = await supa.auth.signInWithPassword({ email, password });
-      if (error) throw new Error(error.message);
+      if (error) throw friendlyDbError(error);
       this.user = await this._profile(data.user.id);
       if (!this.user) throw new Error("Profile not found. Please contact the admin.");
       if (!this.user.active) {
@@ -327,7 +359,7 @@
         email, password,
         options: { data: { full_name: name, role } }
       });
-      if (error) throw new Error(error.message);
+      if (error) throw friendlyDbError(error);
       if (!data.session) {
         throw new Error("Almost there! Please confirm your email, then sign in.");
       }
@@ -357,7 +389,7 @@
 
     async getMenu() {
       const { data, error } = await supa.from("menu_items").select("*").order("created_at", { ascending: true });
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return (data || []).map(mapMenu);
     },
 
@@ -367,7 +399,7 @@
         emoji: d.emoji, image_url: d.image || null, prep_time: d.prepTime,
         dietary: d.dietary, available: d.available, rating: d.rating ?? 4.5, badge: d.badge || null
       }).select().single();
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return mapMenu(data);
     },
 
@@ -377,13 +409,13 @@
         emoji: d.emoji, image_url: d.image || null, prep_time: d.prepTime,
         dietary: d.dietary, available: d.available, badge: d.badge || null
       }).eq("id", id).select().single();
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return mapMenu(data);
     },
 
     async deleteMenuItem(id) {
       const { error } = await supa.from("menu_items").delete().eq("id", id);
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
     },
 
     async getOrders() {
@@ -392,7 +424,7 @@
         .order("created_at", { ascending: false });
       if (!["staff", "admin"].includes(this.user.role)) q = q.eq("user_id", this.user.id);
       const { data, error } = await q;
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return (data || []).map(mapOrder);
     },
 
@@ -402,14 +434,14 @@
         role: order.role, status: "placed", total: order.total,
         pickup_slot: order.slot, payment_method: order.payment
       }).select().single();
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
 
       const rows = order.items.map((i) => ({
         order_id: created.id, menu_item_id: i.id, name: i.name,
         price: i.price, qty: i.qty, emoji: i.emoji, dietary: i.dietary
       }));
       const { error: e2 } = await supa.from("order_items").insert(rows);
-      if (e2) throw e2;
+      if (e2) throw friendlyDbError(e2);
 
       return {
         id: created.id, userId: this.user.id, studentName: order.customerName,
@@ -421,14 +453,14 @@
 
     async updateOrderStatus(id, status) {
       const { error } = await supa.from("orders").update({ status }).eq("id", id);
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
     },
 
     async getFavorites() {
       if (!this.user) return [];
       const { data, error } = await supa.from("favorites")
         .select("menu_item_id").eq("user_id", this.user.id);
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return (data || []).map((f) => f.menu_item_id);
     },
 
@@ -441,13 +473,13 @@
         return false;
       }
       const { error } = await supa.from("favorites").insert({ user_id: this.user.id, menu_item_id: itemId });
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return true;
     },
 
     async getUsers() {
       const { data, error } = await supa.from("profiles").select("*").order("created_at", { ascending: true });
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return (data || []).map(mapProfile);
     },
 
@@ -470,7 +502,7 @@
       if (patch.role !== undefined) payload.role = patch.role;
       if (patch.active !== undefined) payload.active = patch.active;
       const { data, error } = await supa.from("profiles").update(payload).eq("id", id).select().single();
-      if (error) throw error;
+      if (error) throw friendlyDbError(error);
       return mapProfile(data);
     },
 

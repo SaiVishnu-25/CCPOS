@@ -71,6 +71,24 @@ function toast(msg, type = "success") {
   }, 3400);
 }
 
+/* Persistent banner shown when Supabase is connected but its schema is missing. */
+function showSetupBanner(message) {
+  if ($("#setupBanner")) return;
+  const bar = document.createElement("div");
+  bar.id = "setupBanner";
+  bar.className = "setup-banner";
+  bar.innerHTML = `
+    <span class="setup-banner-icon">🛠️</span>
+    <span class="setup-banner-text">${esc(message || "Supabase is connected but the database is not initialised. Run supabase-schema.sql in the Supabase SQL Editor, then reload this page.")}</span>
+    <button class="setup-banner-close" type="button" aria-label="Dismiss">×</button>`;
+  document.body.appendChild(bar);
+  document.body.classList.add("setup-banner-open");
+  bar.querySelector(".setup-banner-close").addEventListener("click", () => {
+    bar.remove();
+    document.body.classList.remove("setup-banner-open");
+  });
+}
+
 function roleBadge(role) {
   const m = ROLE_META[role] || { label: role, emoji: "🙂" };
   return `<span class="role-badge ${role}">${m.emoji} ${m.label}</span>`;
@@ -1027,6 +1045,9 @@ const app = {
     bindGlobalEvents();
     try {
       state.user = await Store.init();
+      if (Store.mode === "supabase" && Store.schemaReady === false) {
+        showSetupBanner(Store.schemaError?.message);
+      }
     } catch (e) {
       console.error(e);
       toast(e.message || "Could not initialise.", "error");
@@ -1052,9 +1073,17 @@ const app = {
   },
 
   async refresh() {
+    try { state.cart = Store.getCart(); } catch { state.cart = []; }
+
     try {
       state.menu = await Store.getMenu();
-      state.cart = Store.getCart();
+    } catch (e) {
+      state.menu = [];
+      console.error(e);
+      toast(e.message || "Failed to load the menu.", "error");
+    }
+
+    try {
       if (Store.user) {
         state.user = Store.user;
         state.favorites = await Store.getFavorites();
